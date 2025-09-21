@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product</title>
+<style>
+  body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f2f2f2; }
+  header { background:#131921; color:white; padding:10px; display:flex; align-items:center; justify-content:space-between; }
+  .logo { font-size:24px; font-weight:bold; color:#ff9900; cursor:pointer; }
+  .product-container { max-width:800px; margin:20px auto; background:white; padding:20px; border-radius:8px; display:flex; gap:20px; }
+  .product-container img { width:300px; height:300px; object-fit:cover; }
+  .product-details { flex:1; }
+  .product-details h2 { margin-top:0; }
+  .product-details p { margin:10px 0; }
+  .product-details button { padding:10px 15px; background:#ff9900; border:none; border-radius:5px; cursor:pointer; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" onclick="window.location.href='index.html'">Store</div>
+</header>
+
+<div class="product-container" id="productContainer">
+  <!-- Product info will load here -->
+</div>
+
+<script>
+const STORAGE = { PRODUCTS:'store_products', CART:'store_cart' };
+function read(k,f){try{return JSON.parse(localStorage.getItem(k))||f}catch{return f}};
+let products = read(STORAGE.PRODUCTS, []);
+let cart = read(STORAGE.CART, []);
+
+function getProductId(){
+  const params = new URLSearchParams(window.location.search);
+  return parseInt(params.get('id'));
+}
+
+function addToCart(id){
+  const ex = cart.find(c=>c.id===id);
+  if(ex) ex.qty++; else cart.push({id, qty:1});
+  localStorage.setItem(STORAGE.CART, JSON.stringify(cart));
+  alert('Added to cart');
+}
+
+function renderProduct(){
+  const id = getProductId();
+  const p = products.find(x=>x.id===id);
+  if(!p){ document.getElementById('productContainer').innerHTML='<p>Product not found.</p>'; return; }
+  const container = document.getElementById('productContainer');
+  container.innerHTML=`
+    <img src="${p.image}" alt="${p.title}">
+    <div class="product-details">
+      <h2>${p.title}</h2>
+      <p>${p.description}</p>
+      <p><strong>$${p.price.toFixed(2)}</strong></p>
+      <button onclick="addToCart(${p.id})">Add to Cart</button>
+    </div>
+  `;
+}
+
+renderProduct();
+</script>
+</body>
+</html>
